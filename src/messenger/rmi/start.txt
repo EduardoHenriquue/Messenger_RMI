@@ -1,0 +1,7 @@
+rmiregistry
+
+java -classpath bin/ -Djava.rmi.server.codebase=file:bin/ messenger.rmi.MessengerServerImpl
+
+java -classpath bin/ -Djava.rmi.server.codebase=file:bin/ messenger.rmi.MessengerClientImpl client1
+
+java -classpath bin/ -Djava.rmi.server.codebase=file:bin/ messenger.rmi.MessengerClientImpl client2
