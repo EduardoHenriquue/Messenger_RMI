@@ -55,9 +55,9 @@ public interface MessengerServer extends Remote {
 
     boolean isUserLogged(String userName) throws RemoteException;
 
-    void createGroup(StringTokenizer lineTokenizer) throws RemoteException;
+    boolean createGroup(String nameGroup) throws RemoteException;
 
-    void addUser(StringTokenizer lineTokenizer) throws RemoteException;
+    boolean addUser(String groupName, String member) throws RemoteException;
 
     boolean msgGroup(String fromClient, String groupName, String msg) throws RemoteException;
    

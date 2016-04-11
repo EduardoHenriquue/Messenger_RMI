@@ -91,48 +91,40 @@ public class MessengerServerImpl implements MessengerServer {
 	}
 
 	@Override
-	public void createGroup(StringTokenizer lineTokenizer) throws RemoteException {
+	public boolean createGroup(String nameGroup) throws RemoteException {
 		// Cria um grupo
 		GroupImpl group = new GroupImpl();
 		// Obtém o token com o nome do grupo
-		String groupName = lineTokenizer.nextToken();
-		// Seta o grupo criado com o token obtido
-		group.setNameGroup(groupName);
-
-		while (lineTokenizer.hasMoreTokens()) {
-			// Lê o próximo token
-			String userName = lineTokenizer.nextToken();
-			// Verifica se o usuário foi criado e adiciona-o no grupo criado
-			if(this.nameUsers.contains(userName)){
-				MessengerClient client = this.users.get(userName);
-				group.addMembers(client, userName);
-			} else {
-				System.err.println("User does not exist!");
-			}
+		// Seta o grupo criado com parâmetro recebido
+		group.setNameGroup(nameGroup);
+		// Se o grupo não está na lista
+		if (!this.groups.contains(group)) {
+			// Adiciona o grupo criado na lista de grupos
+			this.groups.add(group);
+			return true;
+		} else {
+			System.err.println("Existing user!");
+			return false;
 		}
-		// Adiciona o grupo criado na lista de grupos
-		this.groups.add(group);
 	}
 
 	@Override
-	public void addUser(StringTokenizer lineTokenizer) throws RemoteException {
-		// Obtém o token com o nome do grupo
-		String groupName = lineTokenizer.nextToken();
+	public boolean addUser(String groupName, String member) throws RemoteException {
 		// Verifica se esse grupo existe
 		if(this.groups.contains(groupName)){
 			GroupImpl group = getGroupImpl(groupName);
-			while (lineTokenizer.hasMoreTokens()) {
-				// Lê o próximo token
-				String userName = lineTokenizer.nextToken();
-				// Verifica se o usuário foi criado e adiciona-o no grupo criado
-				if(this.nameUsers.contains(userName)){
-					MessengerClient client = this.users.get(userName);
-					group.addMembers(client, userName);
-				} else {
-					System.err.println("User does not exist!");
-				}
+			// Verifica se o usuário foi criado e adiciona-o no grupo criado
+			if(this.nameUsers.contains(member)){
+				MessengerClient client = this.users.get(member);
+				group.addMembers(client, member);
+				return true;
+			} else {
+				System.err.println("User does not exist!");
+				return false;
 			}
 		}
+		System.err.println("Group does not exist!");
+		return false;
 	}
 
 	public GroupImpl getGroupImpl(String name){

@@ -1,12 +1,13 @@
 package messenger.rmi;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.*;
 
 /**
  * Created by Eduardo on 10/04/2016.
  */
-public class GroupImpl {
+public class GroupImpl implements Serializable{
 
     private String nameGroup;
     private Map<String, MessengerClient> members;

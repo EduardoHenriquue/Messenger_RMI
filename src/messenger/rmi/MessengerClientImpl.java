@@ -43,7 +43,8 @@ public class MessengerClientImpl implements MessengerClient {
 			msg.append(lineTokenizer.nextToken() + " ");
 		}
 		if (!server.sendMsg(userName, to, msg.toString())) {
-			System.err.println("Message not sent!");
+			System.err.println("Message not sent!" +
+					"\nUser does not exist or is not logged in.");
 		}
 	}
 
@@ -81,6 +82,34 @@ public class MessengerClientImpl implements MessengerClient {
 		if (!server.msgGroup(userName, groupName, msg.toString())) {
 			System.err.println("Message not sent!");
 		}
+	}
+
+	private static void handleCreateGroup(MessengerServer server,StringTokenizer lineTokenizer) throws RemoteException {
+		String groupName = lineTokenizer.nextToken();
+		server.createGroup(groupName);
+		while (lineTokenizer.hasMoreTokens()) {
+			// Lê o próximo token
+			String userName = lineTokenizer.nextToken();
+			// Verifica se o usuário foi criado e adiciona-o no grupo criado
+			if(!server.addUser(groupName, userName)){
+				System.err.println("User does not exist!");
+			}
+		}
+
+	}
+
+	private static void handleAddUser(MessengerServer server,StringTokenizer lineTokenizer) throws RemoteException{
+		String groupName = lineTokenizer.nextToken();
+		while (lineTokenizer.hasMoreTokens()){
+			// Lê o próximo token
+			String userName = lineTokenizer.nextToken();
+			if (!server.addUser(groupName, userName)){
+				System.err.println("User does not exist!" +
+						"\nOR" +
+						"\nGroup does not exist!");
+			}
+		}
+
 	}
 
 
@@ -123,13 +152,13 @@ public class MessengerClientImpl implements MessengerClient {
 						handleMsgBroadcast(userName, server, lineTokenizer);
 					}
 					else if(command.equals("create-group")){
-						server.createGroup(lineTokenizer);
+						handleCreateGroup(server, lineTokenizer);
 					}
 					else if(command.equals("group-msg")){
-						handleMsg(userName, server, lineTokenizer);
+						handleMsgGroup(userName, server, lineTokenizer);
 					}
 					else if(command.equals("add-members-in-group")){
-						server.addUser(lineTokenizer);
+						handleAddUser(server,lineTokenizer);
 					}
 					else if (command.equals("logout")) {
 						server.logout(userName);
