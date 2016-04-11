@@ -14,9 +14,12 @@ public class MessengerClientImpl implements MessengerClient {
 	private String userName;
 	private static String COMMANDS = "Commands: \n" +
 									 "\t login \n" +
+			                         "\t users \n" +
 									 "\t msg <username> <message> \n" +
-									 "\t users \n" +
 			                         "\t broadcast <message> \n" +
+									 "\t create-group <groupname> <username-1> <username-n> \n" +
+									 "\t group-msg <groupname> <message> \n" +
+									 "\t add-members-in-group <groupname> <username-1> <username-n> \n" +
 									 "\t logout";
 	private static String INIT_CHAR = "$ ";
 	
@@ -62,6 +65,24 @@ public class MessengerClientImpl implements MessengerClient {
 		}
 	}
 
+	/**
+	 *  Envia uma mensagem para os usuários de um grupo
+	 * @param userName
+	 * @param server
+	 * @param lineTokenizer
+	 * @throws RemoteException
+     */
+	private static void handleMsgGroup(String userName, MessengerServer server, StringTokenizer lineTokenizer) throws RemoteException {
+		String groupName = lineTokenizer.nextToken();
+		StringBuilder msg = new StringBuilder();
+		while (lineTokenizer.hasMoreTokens()) {
+			msg.append(lineTokenizer.nextToken() + " ");
+		}
+		if (!server.msgGroup(userName, groupName, msg.toString())) {
+			System.err.println("Message not sent!");
+		}
+	}
+
 
 
 	public static void main(String[] args) {
@@ -98,11 +119,20 @@ public class MessengerClientImpl implements MessengerClient {
 							System.err.println("You are not logged in!");
 						}
 					}
-					else if (command.equals("logout")) {
-						server.logout(userName);
-					}
 					else if(command.equals("broadcast")) {
 						handleMsgBroadcast(userName, server, lineTokenizer);
+					}
+					else if(command.equals("create-group")){
+						server.createGroup(lineTokenizer);
+					}
+					else if(command.equals("group-msg")){
+						handleMsg(userName, server, lineTokenizer);
+					}
+					else if(command.equals("add-members-in-group")){
+						server.addUser(lineTokenizer);
+					}
+					else if (command.equals("logout")) {
+						server.logout(userName);
 					}
 					else {
 						System.err.println("Unknown command: " + command + "\n" + COMMANDS);

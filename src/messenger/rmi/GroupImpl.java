@@ -19,8 +19,8 @@ public class GroupImpl {
         this.members.put(userName, client);
     }
 
-    public String listMembers(){
-        return this.members.keySet().toString();
+    public Map<String, MessengerClient> getMembers(){
+        return this.members;
     }
 
     public String getNameGroup() {

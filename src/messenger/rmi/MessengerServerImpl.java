@@ -90,7 +90,7 @@ public class MessengerServerImpl implements MessengerServer {
 		return this.users.containsKey(userName);
 	}
 
-
+	@Override
 	public void createGroup(StringTokenizer lineTokenizer) throws RemoteException {
 		// Cria um grupo
 		GroupImpl group = new GroupImpl();
@@ -114,14 +114,58 @@ public class MessengerServerImpl implements MessengerServer {
 		this.groups.add(group);
 	}
 
-
-	public void addUser(MessengerClient client) throws RemoteException {
-
+	@Override
+	public void addUser(StringTokenizer lineTokenizer) throws RemoteException {
+		// Obtém o token com o nome do grupo
+		String groupName = lineTokenizer.nextToken();
+		// Verifica se esse grupo existe
+		if(this.groups.contains(groupName)){
+			GroupImpl group = getGroupImpl(groupName);
+			while (lineTokenizer.hasMoreTokens()) {
+				// Lê o próximo token
+				String userName = lineTokenizer.nextToken();
+				// Verifica se o usuário foi criado e adiciona-o no grupo criado
+				if(this.nameUsers.contains(userName)){
+					MessengerClient client = this.users.get(userName);
+					group.addMembers(client, userName);
+				} else {
+					System.err.println("User does not exist!");
+				}
+			}
+		}
 	}
 
-
-	public String listGroups() throws RemoteException {
+	public GroupImpl getGroupImpl(String name){
+		for (GroupImpl group : this.groups){
+			if(group.getNameGroup().equals(name)){
+				return group;
+			}
+		}
 		return null;
+	}
+
+	@Override
+	public boolean msgGroup(String fromClient, String groupName, String msg) throws RemoteException {
+		GroupImpl group = this.getGroupImpl(groupName);
+		if(group != null){
+			// Itera no map de usuários para enviar mensagem para cada um
+			for(Map.Entry<String, MessengerClient> entry : group.getMembers().entrySet()){
+				// Obtém o usuário que irá receber a mensagem
+				String toClient = entry.getKey();
+
+				if(toClient == null){
+					return false;
+				}
+				// Verificação para evitar que um usuário envie mensagem para ele mesmo
+				if(!toClient.equals(fromClient)){
+					// Envia mensagem para os usuários
+					this.sendMsg(fromClient, toClient, msg);
+				}
+			}
+			return true;
+		} else{
+			return false;
+		}
 	}
 
 

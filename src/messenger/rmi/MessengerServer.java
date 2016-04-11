@@ -40,6 +40,7 @@ package messenger.rmi;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 public interface MessengerServer extends Remote {
     void login(MessengerClient client, String userName) throws RemoteException;
@@ -54,5 +55,10 @@ public interface MessengerServer extends Remote {
 
     boolean isUserLogged(String userName) throws RemoteException;
 
+    void createGroup(StringTokenizer lineTokenizer) throws RemoteException;
+
+    void addUser(StringTokenizer lineTokenizer) throws RemoteException;
+
+    boolean msgGroup(String fromClient, String groupName, String msg) throws RemoteException;
    
 } 
