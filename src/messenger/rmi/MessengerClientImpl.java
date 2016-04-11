@@ -84,12 +84,13 @@ public class MessengerClientImpl implements MessengerClient {
 		}
 	}
 
-	private static void handleCreateGroup(MessengerServer server,StringTokenizer lineTokenizer) throws RemoteException {
+	private static void handleCreateGroup(String userName, MessengerServer server,StringTokenizer lineTokenizer) throws RemoteException {
 		String groupName = lineTokenizer.nextToken();
 		server.createGroup(groupName);
+		server.addUser(groupName, userName);
 		while (lineTokenizer.hasMoreTokens()) {
 			// Lê o próximo token
-			String userName = lineTokenizer.nextToken();
+			String member = lineTokenizer.nextToken();
 			// Verifica se o usuário foi criado e adiciona-o no grupo criado
 			if(!server.addUser(groupName, userName)){
 				System.err.println("User does not exist!");
@@ -152,7 +153,7 @@ public class MessengerClientImpl implements MessengerClient {
 						handleMsgBroadcast(userName, server, lineTokenizer);
 					}
 					else if(command.equals("create-group")){
-						handleCreateGroup(server, lineTokenizer);
+						handleCreateGroup(userName, server, lineTokenizer);
 					}
 					else if(command.equals("group-msg")){
 						handleMsgGroup(userName, server, lineTokenizer);

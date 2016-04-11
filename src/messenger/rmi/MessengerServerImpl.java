@@ -85,11 +85,22 @@ public class MessengerServerImpl implements MessengerServer {
 		return true;
 	}
 
+	/**
+	 *  Verifica se o usuário está logado
+	 * @param userName
+	 * @return
+     */
 	@Override
 	public boolean isUserLogged(String userName){
 		return this.users.containsKey(userName);
 	}
 
+	/**
+	 *  Cria um grupo de bate-papo
+	 * @param nameGroup
+	 * @return
+	 * @throws RemoteException
+     */
 	@Override
 	public boolean createGroup(String nameGroup) throws RemoteException {
 		// Cria um grupo
@@ -103,15 +114,22 @@ public class MessengerServerImpl implements MessengerServer {
 			this.groups.add(group);
 			return true;
 		} else {
-			System.err.println("Existing user!");
+			System.err.println("Existing group!");
 			return false;
 		}
 	}
 
+	/**
+	 *  Adiciona usuários em um grupo de bate-papo criado
+	 * @param groupName
+	 * @param member
+	 * @return
+	 * @throws RemoteException
+     */
 	@Override
 	public boolean addUser(String groupName, String member) throws RemoteException {
 		// Verifica se esse grupo existe
-		if(this.groups.contains(groupName)){
+		if(this.groups.contains(this.getGroupImpl(groupName))){
 			GroupImpl group = getGroupImpl(groupName);
 			// Verifica se o usuário foi criado e adiciona-o no grupo criado
 			if(this.nameUsers.contains(member)){
@@ -127,6 +145,11 @@ public class MessengerServerImpl implements MessengerServer {
 		return false;
 	}
 
+	/**
+	 *  Obtém um grupo de bate-papo criado
+	 * @param name
+	 * @return
+     */
 	public GroupImpl getGroupImpl(String name){
 		for (GroupImpl group : this.groups){
 			if(group.getNameGroup().equals(name)){
@@ -136,6 +159,14 @@ public class MessengerServerImpl implements MessengerServer {
 		return null;
 	}
 
+	/**
+	 *  Envia mensagem para os usuários de um grupo de bate-papo
+	 * @param fromClient
+	 * @param groupName
+	 * @param msg
+	 * @return
+	 * @throws RemoteException
+     */
 	@Override
 	public boolean msgGroup(String fromClient, String groupName, String msg) throws RemoteException {
 		GroupImpl group = this.getGroupImpl(groupName);
